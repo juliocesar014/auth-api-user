@@ -126,12 +126,29 @@ func updateUser(db *sql.DB) http.HandlerFunc {
 		vars := mux.Vars(r)
 		id := vars["id"]
 
-		_, err := db.Exec("UPDATE users SET name = $1, email = $2, password = $3 WHERE id = $4", u.Name, u.Email, u.Password, id)
+		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(u.Password), bcrypt.DefaultCost)
 		if err != nil {
-			log.Fatal(err)
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(map[string]string{"message": "Failed to hash password"})
+			return
 		}
 
-		json.NewEncoder(w).Encode(u)
+		_, err = db.Exec("UPDATE users SET name = $1, email = $2, password = $3 WHERE id = $4", u.Name, u.Email, string(hashedPassword), id)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(map[string]string{"message": "Failed to update user"})
+			return
+		}
+
+		var updatedUser User
+		err = db.QueryRow("SELECT * FROM users WHERE id = $1", id).Scan(&updatedUser.ID, &updatedUser.Name, &updatedUser.Email, &updatedUser.Password)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(map[string]string{"message": "Failed to retrieve updated user"})
+			return
+		}
+
+		json.NewEncoder(w).Encode(updatedUser)
 	}
 }
 
