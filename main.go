@@ -39,7 +39,7 @@ func main() {
 	router.HandleFunc("/users", createUser(db)).Methods("POST")
 	router.HandleFunc("/users/{id}", updateUser(db)).Methods("PUT")
 	router.HandleFunc("/users/{id}", deleteUser(db)).Methods("DELETE")
-	router.HandleFunc("/health", healthCheck()).Methods("GET")
+	router.HandleFunc("/health", healthCheck).Methods("GET")
 	router.HandleFunc("/login", login(db, []byte("secret-key"))).Methods("POST")
 
 	log.Fatal(http.ListenAndServe(":8000", jsonContentTypeMiddleware(router)))
@@ -183,23 +183,23 @@ func deleteUser(db *sql.DB) http.HandlerFunc {
 	}
 }
 
-func healthCheck() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		info := map[string]string{
-			"message": "live",
-			"status":  "ok",
-		}
-
-		jsonData, err := json.Marshal(info)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-		w.Write(jsonData)
+func healthCheck(w http.ResponseWriter, r *http.Request) {
+	info := map[string]string{
+		"message": "live",
+		"status":  "ok",
 	}
+
+	jsonData, err := json.Marshal(info)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+
+	w.WriteHeader(http.StatusOK)
+
+	w.Write(jsonData)
 }
 
 func login(db *sql.DB, secretKey []byte) http.HandlerFunc {
