@@ -13,9 +13,7 @@ git clone git@github.com:juliocesar014/auth-api-user.git
 cd auth-api-user
 ```
 
-```shell
-docker compose build
-```
+
 ```shell
 docker compose up 
 ```
