@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
-	"os"
+	// "os"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/mux"
@@ -21,7 +21,7 @@ type User struct {
 }
 
 func main() {
-	db, err := sql.Open("postgres", os.Getenv("DATABASE_URL"))
+	db, err := sql.Open("postgres", "postgres://bwuihnhn:06LrWixk_df0TM9nuDLpclJ3H4GAlhas@peanut.db.elephantsql.com/bwuihnhn")
 	if err != nil {
 		log.Fatal(err)
 	}
