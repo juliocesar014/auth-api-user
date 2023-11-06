@@ -5,10 +5,11 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
-	// "os"
+	"os"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/mux"
+	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -21,7 +22,13 @@ type User struct {
 }
 
 func main() {
-	db, err := sql.Open("postgres", "postgres://bwuihnhn:06LrWixk_df0TM9nuDLpclJ3H4GAlhas@peanut.db.elephantsql.com/bwuihnhn")
+	if err := godotenv.Load(); err != nil {
+		log.Fatal("Erro ao carregar o arquivo .env")
+	}
+
+	dbURL := os.Getenv("DB_URL")
+
+	db, err := sql.Open("postgres", dbURL)
 	if err != nil {
 		log.Fatal(err)
 	}

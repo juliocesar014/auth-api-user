@@ -12,8 +12,14 @@ git clone git@github.com:juliocesar014/auth-api-user.git
 ```shell
 cd auth-api-user
 ```
+
+#### ps: Create you .env file with DB_URL
+
 ```shell
-docker compose up 
+docker build -t auth-api-user .
+```
+```shell
+docker run -p 8000:8000 auth-api-user
 ```
 
 
