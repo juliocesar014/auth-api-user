@@ -23,7 +23,7 @@ type User struct {
 
 func main() {
 	if err := godotenv.Load(); err != nil {
-		log.Fatal("Erro ao carregar o arquivo .env")
+		log.Fatal("Error to loading file .env")
 	}
 
 	dbURL := os.Getenv("DB_URL")
@@ -222,7 +222,6 @@ func login(db *sql.DB, secretKey []byte) http.HandlerFunc {
 			return
 		}
 
-		// Verifique o email do usuário
 		var storedUser User
 		err = db.QueryRow("SELECT * FROM users WHERE email = $1", loginData.Email).Scan(&storedUser.ID, &storedUser.Name, &storedUser.Email, &storedUser.Password)
 		if err != nil {
@@ -230,14 +229,12 @@ func login(db *sql.DB, secretKey []byte) http.HandlerFunc {
 			return
 		}
 
-		// Verifique a senha
 		err = bcrypt.CompareHashAndPassword([]byte(storedUser.Password), []byte(loginData.Password))
 		if err != nil {
 			http.Error(w, "Invalid email or password", http.StatusUnauthorized)
 			return
 		}
 
-		// Gere o token JWT
 		token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 			"userId": storedUser.ID,
 		})
@@ -248,7 +245,6 @@ func login(db *sql.DB, secretKey []byte) http.HandlerFunc {
 			return
 		}
 
-		// Retorne o token gerado como resposta
 		response := map[string]string{
 			"token": tokenString,
 		}
